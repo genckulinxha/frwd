@@ -1,0 +1,10 @@
+This is a sample text file to demonstrate LLM token counting.
+
+The file contains multiple paragraphs with different types of content:
+- Regular sentences with common words
+- Technical terms like "API", "JSON", "authentication", and "tokenization"
+- Numbers: 12345, 67890
+- Special characters: @#$%^&*()
+- A longer paragraph to test how the token counter handles extended text: Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+
+This should give us a good sense of how many tokens different types of content generate across various LLM models. 

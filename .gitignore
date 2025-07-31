@@ -1,0 +1,61 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+venv/
+.env/
+.envrc
+.venv/
+pip-wheel-metadata/
+
+# Environment variables
+*.env
+*.env.*
+
+# VS Code
+.vscode/
+
+# PyCharm
+.idea/
+
+# macOS files
+.DS_Store
+
+# Logs and debug
+*.log
+
+# Alembic migration cache
+alembic/__pycache__/
+versions/__pycache__/
+
+# SQLite or other local DBs
+*.sqlite3
+*.db
+
+# Coverage
+.coverage
+htmlcov/
+.cache/
+.tox/
+.pytest_cache/
+
+# Test results
+junit-*.xml
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+
+# Ignore data or model folders
+data/
+models/
+checkpoints/
+
+# Ignore notebooks
+*.ipynb_checkpoints
+
+# Optional: compiled C extensions
+*.so

@@ -1,0 +1,6 @@
+requests
+beautifulsoup4
+sqlalchemy
+psycopg2-binary
+alembic
+pdfminer.six
