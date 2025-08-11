@@ -59,14 +59,23 @@ class HttpClient:
             "User-Agent": CONFIG.user_agent
         })
         self.retry_manager = RetryManager(retry_config)
+        self._english_switched = False
     
     def get(self, url: str, **kwargs) -> requests.Response:
-        """GET request with retry logic."""
+        """GET request with retry logic and automatic English language switching."""
         kwargs.setdefault('timeout', self.retry_manager.config.timeout)
         
         def _get():
             response = self.session.get(url, **kwargs)
             response.raise_for_status()
+            
+            # Auto-switch to English for gzk.rks-gov.net sites
+            if not self._english_switched and "gzk.rks-gov.net" in url:
+                self._switch_to_english(response, url)
+                # After switching, make a fresh request to get English content
+                response = self.session.get(url, **kwargs)
+                response.raise_for_status()
+            
             return response
         
         return self.retry_manager.retry_with_backoff(_get)
@@ -93,6 +102,62 @@ class HttpClient:
             raise PipelineError(f"HTML parsing rejected: {e}")
         except Exception as e:
             raise PipelineError(f"HTML parsing error: {e}")
+    
+    def __enter__(self):
+        """Context manager entry."""
+        return self
+    
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        """Context manager exit."""
+        if hasattr(self.session, 'close'):
+            self.session.close()
+    
+    def _switch_to_english(self, response: requests.Response, base_url: str):
+        """Switch the website to English language."""
+        try:
+            soup = BeautifulSoup(response.text, "html.parser")
+            
+            # Check if already in English
+            active_lang = soup.find("a", class_="lang_main_active")
+            if active_lang and "English" in active_lang.get_text():
+                self._english_switched = True
+                logger.debug("Already in English language")
+                return
+        
+            # Extract ALL hidden form fields
+            form_data = {}
+            form = soup.find("form")
+            if form:
+                for inp in form.find_all("input", type="hidden"):
+                    name = inp.get("name", "")
+                    value = inp.get("value", "")
+                    if name:
+                        form_data[name] = value
+            
+            # Set language switch event with exact parameters
+            form_data["__EVENTTARGET"] = "ctl00$ctlLang1$lbEnglish"
+            form_data["__EVENTARGUMENT"] = ""
+            
+            # Use browser-like headers (no XMLHttpRequest)
+            headers = {
+                "Content-Type": "application/x-www-form-urlencoded",
+                "Origin": "https://gzk.rks-gov.net",
+                "Referer": base_url,
+                "Cache-Control": "max-age=0",
+                "Upgrade-Insecure-Requests": "1"
+            }
+            
+            # Post language switch request and follow redirects
+            switch_response = self.session.post(base_url, data=form_data, headers=headers, allow_redirects=True)
+            switch_response.raise_for_status()
+            
+            # Mark as switched - the caller will make a fresh request
+            self._english_switched = True
+            
+        except Exception as e:
+            logger.warning(f"Failed to switch to English language: {e}")
+            # Mark as switched anyway to avoid infinite loops
+            self._english_switched = True
 
 
 class BatchProcessor:

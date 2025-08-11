@@ -80,7 +80,9 @@ class DiscoveryProcessor(BasePipelineProcessor, ValidationMixin):
                 response = client.get(base_url)
                 soup = client.parse_html(response.text)
                 
-                # Extract links from initial page
+                # Language switching is now handled automatically by HttpClient
+                
+                # Extract links from initial page (now in English)
                 initial_links = self._extract_links_from_page(soup)
                 all_links.extend(initial_links)
                 page_count += 1
