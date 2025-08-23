@@ -5,9 +5,9 @@ from dataclasses import dataclass
 from typing import Callable, Optional
 from sqlalchemy import text
 from db import init_db, get_session
-from pipeline.discovery.discover_laws_v2 import discover_laws
-from pipeline.detail.process_laws_v2 import process_unprocessed_laws
-from pipeline.relations.backfill_relations_v2 import backfill_relations
+from pipeline.discovery.discover_laws import discover_laws
+from pipeline.detail.process_laws import process_unprocessed_laws
+from pipeline.relations.backfill_relations import backfill_relations
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s | %(levelname)s | %(message)s")
 logger = logging.getLogger(__name__)
